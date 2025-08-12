@@ -79,19 +79,44 @@ export function useGameState() {
       });
 
       let newAutoIncome = prev.autoIncome;
-      if (upgradeId === 'script') {
-        newAutoIncome += amount;
+      if (upgradeId === 'coffee-machine') {
+        newAutoIncome += amount * 0.5;
+      } else if (upgradeId === 'script') {
+        const scriptEnhancerBonus = prev.upgrades.find(u => u.id === 'script-enhancer')?.owned || 0;
+        newAutoIncome += amount * (1 + scriptEnhancerBonus * 0.5);
+      } else if (upgradeId === 'script-enhancer') {
+        // Recalculate all script bonuses
+        const scriptCount = prev.upgrades.find(u => u.id === 'script')?.owned || 0;
+        newAutoIncome = prev.autoIncome + (scriptCount * 0.5 * amount);
       }
 
       let newAssemblyValue = prev.assemblyValue;
       if (upgradeId === 'tooling') {
         newAssemblyValue += amount;
+      } else if (upgradeId === 'assembly-optimizer') {
+        newAssemblyValue += amount * 2;
       }
+
+      // Check for upgrade unlocks
+      const newUpgradesWithUnlocks = newUpgrades.map(u => {
+        if (!u.unlocked) {
+          if (u.id === 'tooling' && prev.money >= 50) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'assembly-optimizer' && prev.research.find(r => r.id === 'efficiency-research')?.completed) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'script-enhancer' && prev.research.find(r => r.id === 'automation-theory')?.completed) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'intern-manager' && (prev.upgrades.find(up => up.id === 'intern')?.owned || 0) >= 3) {
+            return { ...u, unlocked: true };
+          }
+        }
+        return u;
+      });
 
       // Check for research unlocks
       const newResearch = prev.research.map(r => {
         if (!r.unlocked && r.dependencies.every(dep => {
-          if (dep === 'intern') return (newUpgrades.find(u => u.id === 'intern')?.owned || 0) > 0;
+          if (dep === 'intern') return (newUpgradesWithUnlocks.find(u => u.id === 'intern')?.owned || 0) > 0;
           return prev.research.find(res => res.id === dep)?.completed || false;
         })) {
           return { ...r, unlocked: true };
@@ -108,7 +133,7 @@ export function useGameState() {
       return {
         ...prev,
         money: prev.money - totalCost,
-        upgrades: newUpgrades,
+        upgrades: newUpgradesWithUnlocks,
         research: newResearch,
         autoIncome: newAutoIncome,
         assemblyValue: newAssemblyValue,
@@ -174,6 +199,11 @@ export function useGameState() {
           break;
         case 'ascii-schematics':
           newAsciiSchematicsEnabled = true;
+          break;
+        case 'stats-dashboard':
+          if (!newUnlockedTabs.includes('stats')) {
+            newUnlockedTabs.push('stats');
+          }
           break;
       }
 

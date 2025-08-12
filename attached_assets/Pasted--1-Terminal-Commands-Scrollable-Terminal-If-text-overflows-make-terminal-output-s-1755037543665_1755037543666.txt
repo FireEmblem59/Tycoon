@@ -1,0 +1,69 @@
+### **1. Terminal & Commands**
+
+- **Scrollable Terminal:** If text overflows, make terminal output scrollable instead of cutting it off.
+- **Help Command Filtering:**
+
+  - Show only commands that are currently usable based on the player’s state.
+  - Example: If “Project GUI” research is incomplete, `transition gui` should not be shown in `help`.
+
+- **Goal:** Add a first-time player goal: _“Type `help` in the terminal”_.
+- **Debug Commands:** Keep `reset()` and `addMoney <amount>` commands available for testing, but do not show them in `help`.
+
+---
+
+### **2. Research Tab & Display Rules**
+
+- **Fixed Position Container:** The research list container must not overlap the terminal — keep it fixed.
+- Make the container scrollable if it exceeds available vertical space.
+- **Hide Unavailable Research:** Do not display research projects that can’t be started yet (no “greyed out” items).
+- **ASCII Art Schematics Bug:** Fix mismatch between displayed research duration and actual duration.
+- **Research Completion Feedback:** When a research finishes, display a clear completion message in the terminal.
+- **New Research — Stats Tab:**
+
+  - Add a research project that unlocks a “Stats” tab in the UI.
+  - Stats tab displays total money earned, total upgrades purchased, research completed, time played, etc.
+  - Make it accessible only after certain prerequisites (e.g., having hired at least one intern).
+
+---
+
+### **3. Upgrades & Economy**
+
+- **Earlier Passive Income:** Introduce a cheap early upgrade for passive money generation in Stage 1.
+- **Slower Price Growth:** Adjust scaling so early and mid-game prices rise more gradually.
+- **More Upgrades:** Add upgrades for:
+
+  - Increasing income per `assemble`
+  - Boosting script output
+  - Improving intern productivity
+  - Enhancing tooling efficiency
+  - etc (other you can think of)
+
+- Keep pacing similar to **Cookie Clicker** for engagement.
+
+---
+
+### **4. Stage Progression**
+
+- **Stage 1 → Stage 2 (Terminal → GUI)**
+
+  - Capstone research: “Project GUI” (WIMP Interface Development).
+  - Transition requires typing `transition gui` in the terminal with confirmation prompt.
+  - Resets money, upgrades, and buildings.
+  - Stage 2 features “Press Button” mechanic and mouse-related upgrades.
+  - Include Konami code Easter egg for debug in Stage 2.
+
+- **Stage 2 → Stage 3 (Internet Era)**
+
+  - Capstone research: “Global Networking Initiative”.
+  - Transition similar to Stage 1 → 2 (confirmation + full reset).
+  - New focus: websites, online services, traffic-based income.
+  - Introduce upgrades for bandwidth, hosting, and SEO.
+  - Add research projects for automation, online advertising, and “Web 2.0” features.
+
+---
+
+### **5. Integration Notes**
+
+- Fully integrate with the existing React + Vite component structure.
+- Keep state updates immutable.
+- Maintain component-based architecture with separate files for UI, data, and logic.

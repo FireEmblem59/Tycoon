@@ -31,7 +31,9 @@ export default function GameInterface() {
       const timeLeft = duration - (Date.now() - startTime);
       
       if (timeLeft <= 0) {
+        const researchName = gameState.research.find(r => r.id === id)?.name || id;
         completeResearch(id);
+        // Show completion message in terminal would require terminal state management
       } else {
         const timer = setTimeout(() => {
           completeResearch(id);

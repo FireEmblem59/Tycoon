@@ -39,12 +39,20 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 terminal-border p-4 overflow-y-auto">
+      <div className="flex-1 terminal-border p-4 overflow-y-auto max-h-96">
         {/* Goals Tab */}
         {gameState.currentTab === 'goals' && (
           <div>
             <h3 className="text-lg font-bold mb-4 terminal-glow">CURRENT OBJECTIVES</h3>
             <div className="space-y-3 text-sm">
+              {/* Help Tutorial Goal */}
+              {gameState.sessions === 0 && (
+                <div className="border-l-2 border-current pl-3">
+                  <div className="font-semibold">Learn the Interface</div>
+                  <div className="terminal-medium-green">Type "help" in the terminal to see available commands</div>
+                </div>
+              )}
+              
               {/* First Assembly Goal */}
               {gameState.sessions === 0 && (
                 <div className="border-l-2 border-current pl-3">
@@ -123,30 +131,34 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
 
         {/* Research Tab */}
         {gameState.currentTab === 'research' && (
-          <div>
+          <div className="h-full flex flex-col">
             <h3 className="text-lg font-bold mb-4 terminal-glow">RESEARCH PROJECTS</h3>
-            <div className="space-y-4 text-sm">
-              {gameState.research.filter(r => r.unlocked && !r.completed).map(research => (
-                <div key={research.id} className="border border-current p-3">
-                  <div className="font-semibold terminal-green">{research.name}</div>
-                  <div className="terminal-medium-green mb-2">{research.description}</div>
-                  <div className="terminal-green">
-                    Cost: {research.timeRequired} time units | Requires: {research.dependencies.join(', ')}
+            <div className="flex-1 overflow-y-auto space-y-4 text-sm">
+              {gameState.research.filter(r => r.unlocked && !r.completed).map(research => {
+                const internCount = gameState.upgrades.find(u => u.id === 'intern')?.owned || 0;
+                const speedMultiplier = 1 + (internCount * 0.5);
+                const actualDuration = Math.round(research.timeRequired / speedMultiplier);
+                
+                return (
+                  <div key={research.id} className="border border-current p-3">
+                    <div className="font-semibold terminal-green">{research.name}</div>
+                    <div className="terminal-medium-green mb-2">{research.description}</div>
+                    <div className="terminal-green">
+                      Duration: {actualDuration}s | Requires: {research.dependencies.join(', ')}
+                    </div>
+                    <div className="terminal-medium-green">Command: research {research.id}</div>
+                    {gameState.currentResearch?.id === research.id && (
+                      <div className="mt-2 text-yellow-400">Research in progress...</div>
+                    )}
                   </div>
-                  <div className="terminal-medium-green">Command: research {research.id}</div>
-                  {gameState.currentResearch?.id === research.id && (
-                    <div className="mt-2 text-yellow-400">Research in progress...</div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
               
-              {gameState.research.filter(r => !r.unlocked).map(research => (
-                <div key={research.id} className="border border-current p-3 opacity-50">
-                  <div className="font-semibold">{research.name}</div>
-                  <div className="terminal-medium-green mb-2">{research.description}</div>
-                  <div className="terminal-dark-green">Requires: {research.dependencies.join(', ')}</div>
+              {gameState.research.filter(r => r.unlocked && !r.completed).length === 0 && (
+                <div className="terminal-medium-green">
+                  No research available. Purchase upgrades to unlock new projects.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}

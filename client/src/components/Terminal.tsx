@@ -138,7 +138,20 @@ export default function Terminal({
         break;
 
       case 'help':
-        addToHistory(command, 'Available commands: buy [upgrade] [amount], research [project], help, stats, transition');
+        const availableCommands = ['buy [upgrade] [amount]', 'research [project]', 'help', 'clear'];
+        
+        // Add stats if not unlocked yet
+        if (!gameState.unlockedTabs.includes('stats')) {
+          availableCommands.push('stats');
+        }
+        
+        // Add transition only if project-gui is completed
+        const projectGUI = gameState.research.find(r => r.id === 'project-gui');
+        if (projectGUI?.completed) {
+          availableCommands.push('transition gui');
+        }
+        
+        addToHistory(command, `Available commands: ${availableCommands.join(', ')}`);
         break;
 
       case 'transition':
@@ -162,6 +175,25 @@ export default function Terminal({
       case 'clear':
         setHistory([{ text: 'TERMINAL v1.1 - Awaiting commands...', className: 'terminal-medium-green' }]);
         return;
+
+      // Debug commands (not shown in help)
+      case 'reset':
+        addToHistory(command, 'DEBUG: Game reset (not implemented)', 'text-yellow-400');
+        break;
+
+      case 'addmoney':
+        if (parts.length < 2) {
+          addToHistory(command, 'DEBUG: Usage: addmoney [amount]', 'text-yellow-400');
+          return;
+        }
+        const debugAmount = parseInt(parts[1]);
+        if (isNaN(debugAmount)) {
+          addToHistory(command, 'DEBUG: Invalid amount', 'text-red-400');
+          return;
+        }
+        // This would need to be connected to the game state
+        addToHistory(command, `DEBUG: Added $${debugAmount} (not implemented)`, 'text-yellow-400');
+        break;
 
       default:
         if (command.trim() === '') return;
