@@ -1,0 +1,94 @@
+.terminal-border {
+  border: 1px solid var(--terminal-border);
+  box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+.terminal-glow {
+  text-shadow: 0 0 5px var(--terminal-green);
+}
+
+.progress-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--terminal-green) 0px,
+    var(--terminal-green) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: progress-fill 3s ease-in-out;
+}
+
+@keyframes progress-fill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--terminal-green);
+  font-family: 'Courier New', monospace;
+  caret-color: var(--terminal-green);
+}
+
+.tab-active {
+  background: var(--terminal-border);
+  border-bottom: 2px solid var(--terminal-green);
+}
+
+.tab-inactive {
+  color: var(--terminal-dark-green);
+  border-bottom: 1px solid var(--terminal-border);
+}
+
+.ascii-art {
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.loading-screen {
+  transition: opacity 0.5s ease-out;
+}
+
+.game-interface {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.show {
+  opacity: 1;
+}
+
+.hide {
+  opacity: 0;
+}
+
+.terminal-green {
+  color: var(--terminal-green);
+}
+
+.terminal-medium-green {
+  color: var(--terminal-medium-green);
+}
+
+.terminal-dark-green {
+  color: var(--terminal-dark-green);
+}
+
+.terminal-bg {
+  background-color: var(--terminal-bg);
+}
+
+.terminal-border-color {
+  border-color: var(--terminal-border);
+}
