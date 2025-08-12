@@ -177,14 +177,14 @@ export default function Terminal({
   };
 
   return (
-    <div className="terminal-border p-3 h-32">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-bold">TERMINAL v1.1</span>
+    <div className="terminal-border p-4 h-full">
+      <div className="flex justify-between items-center mb-3">
+        <span className="text-lg font-bold terminal-glow">TERMINAL v1.1</span>
         <span className="text-sm terminal-medium-green">AUTOMATED ASSEMBLY CORP.</span>
       </div>
       
       {/* Terminal Output */}
-      <div ref={outputRef} className="text-xs h-16 overflow-y-auto mb-2">
+      <div ref={outputRef} className="text-sm h-32 overflow-y-auto mb-4 font-mono">
         {history.map((line, index) => (
           <div key={index} className={line.className}>
             {line.text}
@@ -194,14 +194,20 @@ export default function Terminal({
       
       {/* Terminal Input */}
       <div className="flex items-center">
-        <span className="mr-2">{'>'}</span>
+        <span className="mr-2 text-lg">{'>'}</span>
         <input 
           type="text" 
-          className="terminal-input flex-1 text-xs" 
+          className="terminal-input flex-1 text-sm" 
           placeholder="Enter command..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
+          onPaste={(e) => {
+            if (!gameState.clipboardEnabled) {
+              e.preventDefault();
+              addToHistory(input, 'ERROR: Clipboard disabled - research "clipboard-api"', 'text-red-400');
+            }
+          }}
         />
       </div>
     </div>

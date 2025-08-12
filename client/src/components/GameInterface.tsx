@@ -67,7 +67,7 @@ export default function GameInterface() {
       </div>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-2 gap-4 h-3/4">
+      <div className="grid grid-cols-2 gap-4 h-2/3">
         {/* Left Panel: Manual Assembly Station */}
         <ManualAssemblyStation
           gameState={gameState}
@@ -82,8 +82,8 @@ export default function GameInterface() {
         />
       </div>
 
-      {/* Terminal Window (Bottom Right) */}
-      <div className="mt-4">
+      {/* Terminal Window (Bottom - Full Width) */}
+      <div className="mt-4 h-48">
         <Terminal
           gameState={gameState}
           onBuyUpgrade={buyUpgrade}

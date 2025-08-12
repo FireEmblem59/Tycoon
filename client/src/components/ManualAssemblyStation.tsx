@@ -55,6 +55,13 @@ export default function ManualAssemblyStation({ gameState, onAssembly }: ManualA
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
+            onPaste={(e) => {
+              if (!gameState.clipboardEnabled) {
+                e.preventDefault();
+                setFeedback('ERROR: Clipboard disabled - research "clipboard-api"');
+                setFeedbackClass('text-red-400');
+              }
+            }}
           />
           <div 
             className="ml-2 px-3 py-1 border border-current cursor-pointer hover:bg-opacity-20 hover:bg-current"

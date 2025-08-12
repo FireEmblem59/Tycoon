@@ -25,7 +25,7 @@ export interface GameState {
 }
 
 const initialState: GameState = {
-  money: 2,
+  money: 0,
   autoIncome: 0,
   sessions: 0,
   stage: 'terminal',
@@ -33,7 +33,7 @@ const initialState: GameState = {
   research: initialResearch,
   currentTab: 'goals',
   startTime: Date.now(),
-  totalEarned: 2,
+  totalEarned: 0,
   researchCompleted: 0,
   currentResearch: null,
   unlockedTabs: ['goals', 'upgrades'],
