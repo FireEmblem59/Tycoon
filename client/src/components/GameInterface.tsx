@@ -4,6 +4,7 @@ import { useInterval } from '../hooks/useInterval';
 import ManualAssemblyStation from './ManualAssemblyStation';
 import TabbedInterface from './TabbedInterface';
 import Terminal from './Terminal';
+import GUIInterface from './GUIInterface';
 
 export default function GameInterface() {
   const {
@@ -14,7 +15,12 @@ export default function GameInterface() {
     startResearch,
     completeResearch,
     switchTab,
-    unlockStatsTab
+    unlockStatsTab,
+    addMoney,
+    resetGame,
+    setHasUsedHelp,
+    transitionToGUI,
+    transitionToTerminal
   } = useGameState();
 
   // Auto income timer
@@ -51,6 +57,19 @@ export default function GameInterface() {
     const seconds = totalSeconds % 60;
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
+
+  // Show GUI interface if in GUI stage
+  if (gameState.stage === 'gui') {
+    return (
+      <GUIInterface
+        gameState={gameState}
+        onBuyUpgrade={buyUpgrade}
+        onStartResearch={startResearch}
+        onSwitchTab={switchTab}
+        onBackToTerminal={transitionToTerminal}
+      />
+    );
+  }
 
   return (
     <div className="game-interface show h-screen p-4">
@@ -92,6 +111,11 @@ export default function GameInterface() {
           onStartResearch={startResearch}
           onUnlockStats={unlockStatsTab}
           onTabSwitch={switchTab}
+          onAddMoney={addMoney}
+          onResetGame={resetGame}
+          hasUsedHelp={gameState.hasUsedHelp}
+          setHasUsedHelp={setHasUsedHelp}
+          onTransitionToGUI={transitionToGUI}
         />
       </div>
     </div>

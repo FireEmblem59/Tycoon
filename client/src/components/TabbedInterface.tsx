@@ -46,7 +46,7 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
             <h3 className="text-lg font-bold mb-4 terminal-glow">CURRENT OBJECTIVES</h3>
             <div className="space-y-3 text-sm">
               {/* Help Tutorial Goal */}
-              {gameState.sessions === 0 && (
+              {!gameState.hasUsedHelp && (
                 <div className="border-l-2 border-current pl-3">
                   <div className="font-semibold">Learn the Interface</div>
                   <div className="terminal-medium-green">Type "help" in the terminal to see available commands</div>
@@ -62,7 +62,7 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
               )}
               
               {/* First Intern Goal */}
-              {gameState.sessions > 0 && gameState.upgrades.find(u => u.id === 'intern')?.owned === 0 && (
+              {gameState.sessions > 0 && gameState.hasUsedHelp && gameState.upgrades.find(u => u.id === 'intern')?.owned === 0 && (
                 <div className="border-l-2 border-current pl-3">
                   <div className="font-semibold">Hire Your First Intern</div>
                   <div className="terminal-medium-green">Cost: $25 | Progress: ${gameState.money}/25</div>

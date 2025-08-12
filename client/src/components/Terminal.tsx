@@ -7,6 +7,11 @@ interface TerminalProps {
   onStartResearch: (researchId: string) => void;
   onUnlockStats: () => void;
   onTabSwitch: (tab: string) => void;
+  onAddMoney: (amount: number) => void;
+  onResetGame: () => void;
+  hasUsedHelp: boolean;
+  setHasUsedHelp: (used: boolean) => void;
+  onTransitionToGUI?: () => void;
 }
 
 interface TerminalLine {
@@ -19,12 +24,19 @@ export default function Terminal({
   onBuyUpgrade, 
   onStartResearch, 
   onUnlockStats, 
-  onTabSwitch 
+  onTabSwitch,
+  onAddMoney,
+  onResetGame,
+  hasUsedHelp,
+  setHasUsedHelp,
+  onTransitionToGUI
 }: TerminalProps) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<TerminalLine[]>([
     { text: 'TERMINAL v1.1 - Awaiting commands...', className: 'terminal-medium-green' }
   ]);
+  
+  // hasUsedHelp is now a prop from parent component
   const outputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -138,6 +150,7 @@ export default function Terminal({
         break;
 
       case 'help':
+        setHasUsedHelp(true);
         const availableCommands = ['buy [upgrade] [amount]', 'research [project]', 'help', 'clear'];
         
         // Add stats if not unlocked yet
@@ -168,8 +181,12 @@ export default function Terminal({
         break;
 
       case 'confirm-transition':
-        // TODO: Implement stage transition
-        addToHistory(command, 'SUCCESS: Initiating GUI transition... (Not implemented yet)', 'text-yellow-400');
+        if (onTransitionToGUI) {
+          onTransitionToGUI();
+          addToHistory(command, 'SUCCESS: Transitioning to GUI era...', 'terminal-green');
+        } else {
+          addToHistory(command, 'ERROR: GUI transition not available', 'text-red-400');
+        }
         break;
 
       case 'clear':
@@ -178,8 +195,10 @@ export default function Terminal({
 
       // Debug commands (not shown in help)
       case 'reset':
-        addToHistory(command, 'DEBUG: Game reset (not implemented)', 'text-yellow-400');
-        break;
+        onResetGame();
+        setHasUsedHelp(false);
+        setHistory([{ text: 'TERMINAL v1.1 - Game reset. Awaiting commands...', className: 'terminal-medium-green' }]);
+        return;
 
       case 'addmoney':
         if (parts.length < 2) {
@@ -191,8 +210,8 @@ export default function Terminal({
           addToHistory(command, 'DEBUG: Invalid amount', 'text-red-400');
           return;
         }
-        // This would need to be connected to the game state
-        addToHistory(command, `DEBUG: Added $${debugAmount} (not implemented)`, 'text-yellow-400');
+        onAddMoney(debugAmount);
+        addToHistory(command, `DEBUG: Added $${debugAmount} to your money`, 'text-yellow-400');
         break;
 
       default:
@@ -216,7 +235,7 @@ export default function Terminal({
       </div>
       
       {/* Terminal Output */}
-      <div ref={outputRef} className="text-sm h-32 overflow-y-auto mb-4 font-mono">
+      <div ref={outputRef} className="text-sm h-32 overflow-y-auto mb-4 font-mono border terminal-border p-2" style={{ scrollBehavior: 'smooth' }}>
         {history.map((line, index) => (
           <div key={index} className={line.className}>
             {line.text}

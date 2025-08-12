@@ -22,6 +22,7 @@ export interface GameState {
   assemblyCommand: string;
   clipboardEnabled: boolean;
   asciiSchematicsEnabled: boolean;
+  hasUsedHelp: boolean;
 }
 
 const initialState: GameState = {
@@ -40,7 +41,8 @@ const initialState: GameState = {
   assemblyValue: 1,
   assemblyCommand: 'assemble',
   clipboardEnabled: false,
-  asciiSchematicsEnabled: false
+  asciiSchematicsEnabled: false,
+  hasUsedHelp: false
 };
 
 export function useGameState() {
@@ -248,6 +250,38 @@ export function useGameState() {
     });
   }, []);
 
+  const addMoney = useCallback((amount: number) => {
+    setGameState(prev => ({
+      ...prev,
+      money: prev.money + amount
+    }));
+  }, []);
+
+  const resetGame = useCallback(() => {
+    setGameState(initialState);
+  }, []);
+
+  const setHasUsedHelp = useCallback((used: boolean) => {
+    setGameState(prev => ({
+      ...prev,
+      hasUsedHelp: used
+    }));
+  }, []);
+
+  const transitionToGUI = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      stage: 'gui'
+    }));
+  }, []);
+
+  const transitionToTerminal = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      stage: 'terminal'
+    }));
+  }, []);
+
   return {
     gameState,
     updateMoney,
@@ -256,7 +290,12 @@ export function useGameState() {
     startResearch,
     completeResearch,
     switchTab,
-    unlockStatsTab
+    unlockStatsTab,
+    addMoney,
+    resetGame,
+    setHasUsedHelp,
+    transitionToGUI,
+    transitionToTerminal
   };
 }
 
