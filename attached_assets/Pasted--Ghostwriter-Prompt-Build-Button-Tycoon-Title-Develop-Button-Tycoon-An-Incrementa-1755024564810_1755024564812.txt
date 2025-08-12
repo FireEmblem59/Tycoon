@@ -1,0 +1,123 @@
+## **Ghostwriter Prompt: Build “Button Tycoon”**
+
+**Title:** Develop “Button Tycoon” — An Incremental Game About the History of UI
+**Tech Stack:** React + Vite + JavaScript + CSS (component-based, functional state updates only)
+
+---
+
+### **1. High-Level Project Goal**
+
+Build a multi-era incremental tycoon game that takes the player through the history of computer user interfaces, starting from a text-only terminal and progressing through multiple eras (Terminal → GUI → Internet → Modern/Mobile).
+Gameplay should evolve dramatically at each stage while keeping a clear tycoon-style upgrade/research loop, similar to **Cookie Clicker** or **Universal Paperclips**.
+
+---
+
+### **2. Core Thematic Vision & Eras**
+
+**Stage 1 — The Terminal Age**
+
+* No buttons, no GUI elements — only text commands in a fixed-position terminal.
+* Aesthetic: green-on-black, retro command-line look.
+* Player types `assemble` to earn money.
+* Fixed-position terminal (no “open terminal” button).
+* Early upgrades: Interns, Scripts, Tooling. Can buy multiples; price increases with each purchase.
+* Some upgrades/research only unlock after reaching certain money milestones.
+* Early research example:
+
+  * **Basic Macro** → shortens “assemble” to “asmb”
+  * **Advanced Macro** → shortens to “a”
+  * **Clipboard API** → allows pasting, but only after both macro upgrades
+  * **ASCII Art Schematics** → adds cosmetic ASCII art in main container
+  * **Improved CLI** → adds color-coding/descriptive terminal output
+* Add many more upgrades/research to match idle game pacing (more like Cookie Clicker).
+* “Stats” tab must be unlocked via research.
+* Research speed affected by interns — but add diminishing returns for balance.
+* Bug fix: ensure item prices in UI match actual required money (previous mismatch).
+* Bug fix: ensure research has actual delay, not instant completion.
+
+**Stage Transition — Terminal → GUI (Stage 2)**
+
+* Transition is triggered by a capstone research project:
+
+  * Name: “Project GUI” or “WIMP Interface Development”
+  * Expensive, time-consuming, requires certain upgrades/research to be completed.
+* When ready, player must type `transition gui` in the terminal.
+* Game warns:
+
+  > “WARNING: Transitioning will reset all money, upgrades, and buildings. Type `y` to confirm or anything else to cancel.”
+* Once confirmed, game state changes completely.
+
+**Stage 2 — The Dawn of the GUI**
+
+* Visual overhaul: black-on-white, pixelated retro GUI style.
+* Main interaction: a single **PRESS BUTTON** to earn money.
+* Mouse-related upgrades: Faster Mouse, Ergonomic Mouse (increase click value or auto-click rate).
+* Add some basic upgrades/research for the GUI era (even if minimal at first).
+* Include a **Konami code** easter egg for debug features in GUI era.
+
+Future eras (brief outline, can stub in code with TODOs):
+
+* **Stage 3 — Internet Era** → websites, traffic income, online services
+* **Stage 4 — Modern/Mobile** → mobile dev, AI, data science projects
+
+---
+
+### **3. Game Systems & Mechanics**
+
+* **Upgrades:** Purchasable items that either improve resource generation or unlock new features.
+
+  * Interns: increase research speed (diminishing returns)
+  * Scripts: increase auto-assembly rate
+  * Tooling: boost efficiency
+  * Costs increase exponentially or by set factor per purchase.
+* **Research:** Unlocks new commands, efficiencies, or aesthetic changes.
+
+  * Must respect dependencies (Clipboard API requires macros).
+  * Research takes real time — no instant completions.
+* **Progression pacing:** Should feel fast enough to keep the player engaged, especially early on. Add intermediate goals and visible progression markers.
+* **Goals System:** Always show next major milestone so player knows how to reach the next era.
+
+---
+
+### **4. Code Architecture**
+
+* **React Components:**
+
+  * `Game.jsx` → central state manager, handles stage transitions.
+  * `Terminal.jsx` → command-line input/output for Stage 1.
+  * `AssembleInput.jsx` → typing mechanic for Stage 1.
+  * `ResearchProjects.jsx` → displays available research projects.
+  * `Upgrades.jsx` → displays available upgrades.
+  * `ExistingResearch.jsx` → defines all research options.
+* **CSS:**
+
+  * `terminal.css` for Stage 1 look.
+  * `gui.css` for Stage 2 look.
+* Use **immutable state updates**:
+
+  ```js
+  setGameState(prev => ({ ...prev, money: prev.money + 1 }))
+  ```
+
+---
+
+### **5. Deliverables**
+
+* Fully functional **React + Vite** project, runnable with `npm install` + `npm run dev`.
+* Stage 1 → Stage 2 transition fully implemented.
+* All files needed to run the game locally — no external proprietary SDKs.
+* Organized code structure, easy to extend for future eras.
+* Include clear TODO comments for unfinished later eras.
+
+---
+
+### **6. Extra Notes**
+
+* Ensure upgrade/research costs match display values.
+* Show/hide upgrades based on prerequisites or money thresholds.
+* Add more flavor text, messages, and cosmetic polish to make it feel alive.
+* Include debug/dev commands for testing (and Konami code in Stage 2).
+
+---
+
+**Now, please create this full multi-file project, including React components, CSS files, and any necessary helper functions or data files. Populate with enough upgrades/research in Stage 1 to feel like an idle game from the start.**
