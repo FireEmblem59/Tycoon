@@ -115,6 +115,6 @@
     @apply font-mono antialiased;
     background: var(--terminal-bg);
     color: var(--terminal-green);
-    overflow: hidden;
+    overflow-x: hidden;
   }
 }

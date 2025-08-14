@@ -11,6 +11,7 @@ export default function GameInterface() {
     gameState,
     updateMoney,
     performAssembly,
+    performButtonPress,
     buyUpgrade,
     startResearch,
     completeResearch,
@@ -20,15 +21,23 @@ export default function GameInterface() {
     resetGame,
     setHasUsedHelp,
     transitionToGUI,
-    transitionToTerminal
+    transitionToTerminal,
+    updateGoals
   } = useGameState();
 
   // Auto income timer
   useInterval(() => {
-    if (gameState.autoIncome > 0) {
+    if (gameState.stage === 'terminal' && gameState.autoIncome > 0) {
       updateMoney(gameState.autoIncome);
+    } else if (gameState.stage === 'gui' && gameState.guiAutoIncome > 0) {
+      updateMoney(gameState.guiAutoIncome);
     }
   }, 1000);
+
+  // Update goals periodically
+  useInterval(() => {
+    updateGoals();
+  }, 500);
 
   // Research completion timer
   useEffect(() => {
@@ -63,16 +72,17 @@ export default function GameInterface() {
     return (
       <GUIInterface
         gameState={gameState}
+        onButtonPress={performButtonPress}
         onBuyUpgrade={buyUpgrade}
         onStartResearch={startResearch}
         onSwitchTab={switchTab}
-        onBackToTerminal={transitionToTerminal}
       />
     );
   }
 
   return (
-    <div className="game-interface show h-screen p-4">
+    <div className="min-h-screen overflow-auto">
+    <div className="game-interface show min-h-screen p-4">
       {/* Header */}
       <div className="mb-4">
         <h1 className="text-2xl font-bold terminal-glow">BUTTON TYCOON</h1>
@@ -88,7 +98,7 @@ export default function GameInterface() {
       </div>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-2 gap-4 h-2/3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         {/* Left Panel: Manual Assembly Station */}
         <ManualAssemblyStation
           gameState={gameState}
@@ -104,7 +114,7 @@ export default function GameInterface() {
       </div>
 
       {/* Terminal Window (Bottom - Full Width) */}
-      <div className="mt-4 h-48">
+      <div className="mt-4 min-h-[200px]">
         <Terminal
           gameState={gameState}
           onBuyUpgrade={buyUpgrade}
@@ -118,6 +128,7 @@ export default function GameInterface() {
           onTransitionToGUI={transitionToGUI}
         />
       </div>
+    </div>
     </div>
   );
 }

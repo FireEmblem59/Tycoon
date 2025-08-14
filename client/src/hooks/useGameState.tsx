@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { initialUpgrades, initialResearch, Upgrade, Research } from '../data/gameData';
+import { initialUpgrades, initialResearch, initialGoals, Upgrade, Research, Goal } from '../data/gameData';
 
 export interface GameState {
   money: number;
@@ -23,6 +23,9 @@ export interface GameState {
   clipboardEnabled: boolean;
   asciiSchematicsEnabled: boolean;
   hasUsedHelp: boolean;
+  goals: Goal[];
+  buttonPresses: number;
+  guiAutoIncome: number;
 }
 
 const initialState: GameState = {
@@ -42,7 +45,10 @@ const initialState: GameState = {
   assemblyCommand: 'assemble',
   clipboardEnabled: false,
   asciiSchematicsEnabled: false,
-  hasUsedHelp: false
+  hasUsedHelp: false,
+  goals: initialGoals,
+  buttonPresses: 0,
+  guiAutoIncome: 0
 };
 
 export function useGameState() {
@@ -65,6 +71,22 @@ export function useGameState() {
     }));
   }, []);
 
+  const performButtonPress = useCallback(() => {
+    setGameState(prev => {
+      const mouseUpgradeBonus = prev.upgrades.find(u => u.id === 'mouse-upgrade')?.owned || 0;
+      const graphicsBonus = prev.upgrades.find(u => u.id === 'graphics-card')?.owned || 0;
+      const baseValue = 1;
+      const totalValue = baseValue + (mouseUpgradeBonus * 0.5) + (graphicsBonus * 2);
+      
+      return {
+        ...prev,
+        money: prev.money + totalValue,
+        buttonPresses: prev.buttonPresses + 1,
+        totalEarned: prev.totalEarned + totalValue
+      };
+    });
+  }, []);
+
   const buyUpgrade = useCallback((upgradeId: string, amount: number = 1) => {
     setGameState(prev => {
       const upgrade = prev.upgrades.find(u => u.id === upgradeId);
@@ -81,6 +103,8 @@ export function useGameState() {
       });
 
       let newAutoIncome = prev.autoIncome;
+      let newGuiAutoIncome = prev.guiAutoIncome;
+      
       if (upgradeId === 'coffee-machine') {
         newAutoIncome += amount * 0.5;
       } else if (upgradeId === 'script') {
@@ -90,6 +114,8 @@ export function useGameState() {
         // Recalculate all script bonuses
         const scriptCount = prev.upgrades.find(u => u.id === 'script')?.owned || 0;
         newAutoIncome = prev.autoIncome + (scriptCount * 0.5 * amount);
+      } else if (upgradeId === 'auto-clicker') {
+        newGuiAutoIncome += amount * 1;
       }
 
       let newAssemblyValue = prev.assemblyValue;
@@ -102,6 +128,8 @@ export function useGameState() {
       // Check for upgrade unlocks
       const newUpgradesWithUnlocks = newUpgrades.map(u => {
         if (!u.unlocked) {
+          if (u.era !== prev.stage) return u;
+          
           if (u.id === 'tooling' && prev.money >= 50) {
             return { ...u, unlocked: true };
           } else if (u.id === 'assembly-optimizer' && prev.research.find(r => r.id === 'efficiency-research')?.completed) {
@@ -109,6 +137,12 @@ export function useGameState() {
           } else if (u.id === 'script-enhancer' && prev.research.find(r => r.id === 'automation-theory')?.completed) {
             return { ...u, unlocked: true };
           } else if (u.id === 'intern-manager' && (prev.upgrades.find(up => up.id === 'intern')?.owned || 0) >= 3) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'auto-clicker' && prev.buttonPresses >= 50) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'gui-framework' && prev.research.find(r => r.id === 'window-manager')?.completed) {
+            return { ...u, unlocked: true };
+          } else if (u.id === 'graphics-card' && prev.research.find(r => r.id === 'graphics-api')?.completed) {
             return { ...u, unlocked: true };
           }
         }
@@ -118,6 +152,7 @@ export function useGameState() {
       // Check for research unlocks
       const newResearch = prev.research.map(r => {
         if (!r.unlocked && r.dependencies.every(dep => {
+          if (r.era !== prev.stage) return false;
           if (dep === 'intern') return (newUpgradesWithUnlocks.find(u => u.id === 'intern')?.owned || 0) > 0;
           return prev.research.find(res => res.id === dep)?.completed || false;
         })) {
@@ -138,6 +173,7 @@ export function useGameState() {
         upgrades: newUpgradesWithUnlocks,
         research: newResearch,
         autoIncome: newAutoIncome,
+        guiAutoIncome: newGuiAutoIncome,
         assemblyValue: newAssemblyValue,
         unlockedTabs: newUnlockedTabs
       };
@@ -147,7 +183,7 @@ export function useGameState() {
   const startResearch = useCallback((researchId: string) => {
     setGameState(prev => {
       const research = prev.research.find(r => r.id === researchId);
-      if (!research || !research.unlocked || research.completed || prev.currentResearch) {
+      if (!research || !research.unlocked || research.completed || prev.currentResearch || research.era !== prev.stage) {
         return prev;
       }
 
@@ -270,22 +306,73 @@ export function useGameState() {
 
   const transitionToGUI = useCallback(() => {
     setGameState(prev => ({
-      ...prev,
-      stage: 'gui'
+      ...initialState,
+      stage: 'gui',
+      startTime: Date.now(),
+      upgrades: initialUpgrades.map(u => ({ ...u, unlocked: u.era === 'gui' && u.unlocked })),
+      research: initialResearch.map(r => ({ ...r, unlocked: r.era === 'gui' && r.unlocked })),
+      goals: initialGoals.map(g => ({ ...g, visible: g.era === 'gui' && g.visible })),
+      unlockedTabs: ['goals', 'upgrades']
     }));
   }, []);
 
   const transitionToTerminal = useCallback(() => {
     setGameState(prev => ({
-      ...prev,
-      stage: 'terminal'
+      ...initialState,
+      goals: initialGoals.map(g => ({ ...g, visible: g.era === 'terminal' && g.visible }))
     }));
   }, []);
 
+  const updateGoals = useCallback(() => {
+    setGameState(prev => {
+      const updatedGoals = prev.goals.map(goal => {
+        let completed = goal.completed;
+        let visible = goal.visible;
+        
+        switch (goal.id) {
+          case 'first-help':
+            completed = prev.hasUsedHelp;
+            break;
+          case 'first-assembly':
+            visible = prev.hasUsedHelp;
+            completed = prev.sessions > 0;
+            break;
+          case 'hire-intern':
+            visible = prev.sessions > 0 && prev.hasUsedHelp;
+            completed = (prev.upgrades.find(u => u.id === 'intern')?.owned || 0) > 0;
+            break;
+          case 'first-research':
+            visible = (prev.upgrades.find(u => u.id === 'intern')?.owned || 0) > 0;
+            completed = prev.researchCompleted > 0;
+            break;
+          case 'gui-transition':
+            visible = prev.researchCompleted > 0;
+            completed = prev.research.find(r => r.id === 'project-gui')?.completed || false;
+            break;
+          case 'first-click':
+            completed = prev.buttonPresses > 0;
+            break;
+          case 'gui-upgrade':
+            visible = prev.buttonPresses > 0;
+            completed = prev.upgrades.some(u => u.era === 'gui' && u.owned > 0);
+            break;
+          case 'automation':
+            visible = prev.upgrades.some(u => u.era === 'gui' && u.owned > 0);
+            completed = prev.research.some(r => r.era === 'gui' && r.completed);
+            break;
+        }
+        
+        return { ...goal, completed, visible };
+      });
+      
+      return { ...prev, goals: updatedGoals };
+    });
+  }, []);
   return {
     gameState,
     updateMoney,
     performAssembly,
+    performButtonPress,
     buyUpgrade,
     startResearch,
     completeResearch,
@@ -296,6 +383,7 @@ export function useGameState() {
     setHasUsedHelp,
     transitionToGUI,
     transitionToTerminal
+    updateGoals
   };
 }
 

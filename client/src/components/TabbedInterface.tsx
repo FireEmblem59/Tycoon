@@ -20,9 +20,12 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
   };
 
   const playTime = Date.now() - gameState.startTime;
+  const terminalGoals = gameState.goals.filter(g => g.era === 'terminal' && g.visible);
+  const terminalUpgrades = gameState.upgrades.filter(u => u.era === 'terminal' && u.unlocked);
+  const terminalResearch = gameState.research.filter(r => r.era === 'terminal' && r.unlocked && !r.completed);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       {/* Tab Navigation */}
       <div className="flex border-b border-current mb-4">
         {gameState.unlockedTabs.map(tab => (
@@ -39,57 +42,43 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 terminal-border p-4 overflow-y-auto max-h-96">
+      <div className="flex-1 terminal-border p-4 overflow-y-auto" style={{ maxHeight: '400px' }}>
         {/* Goals Tab */}
         {gameState.currentTab === 'goals' && (
           <div>
             <h3 className="text-lg font-bold mb-4 terminal-glow">CURRENT OBJECTIVES</h3>
             <div className="space-y-3 text-sm">
-              {/* Help Tutorial Goal */}
-              {!gameState.hasUsedHelp && (
-                <div className="border-l-2 border-current pl-3">
-                  <div className="font-semibold">Learn the Interface</div>
-                  <div className="terminal-medium-green">Type "help" in the terminal to see available commands</div>
-                </div>
-              )}
-              
-              {/* First Assembly Goal */}
-              {gameState.sessions === 0 && (
-                <div className="border-l-2 border-current pl-3">
-                  <div className="font-semibold">Perform First Assembly</div>
-                  <div className="terminal-medium-green">Type "assemble" in the Manual Assembly Station to earn your first dollar</div>
-                </div>
-              )}
-              
-              {/* First Intern Goal */}
-              {gameState.sessions > 0 && gameState.hasUsedHelp && gameState.upgrades.find(u => u.id === 'intern')?.owned === 0 && (
-                <div className="border-l-2 border-current pl-3">
-                  <div className="font-semibold">Hire Your First Intern</div>
-                  <div className="terminal-medium-green">Cost: $25 | Progress: ${gameState.money}/25</div>
-                  <div className="w-full terminal-bg border border-current h-2 mt-1">
-                    <div 
-                      className="bg-current h-full" 
-                      style={{ width: `${getProgressPercentage(gameState.money, 25)}%` }}
-                    ></div>
+              {terminalGoals.length > 0 ? (
+                terminalGoals.map(goal => (
+                  <div key={goal.id} className={`border-l-2 pl-3 ${goal.completed ? 'border-green-500 opacity-60' : 'border-current'}`}>
+                    <div className={`font-semibold ${goal.completed ? 'line-through terminal-dark-green' : ''}`}>
+                      {goal.title}
+                    </div>
+                    <div className="terminal-medium-green">{goal.description}</div>
+                    {goal.id === 'hire-intern' && !goal.completed && (
+                      <div className="mt-2">
+                        <div className="terminal-medium-green">Progress: ${gameState.money}/25</div>
+                        <div className="w-full terminal-bg border border-current h-2 mt-1">
+                          <div 
+                            className="bg-current h-full" 
+                            style={{ width: `${getProgressPercentage(gameState.money, 25)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                    {goal.id === 'gui-transition' && !goal.completed && (
+                      <div className="mt-2">
+                        <div className="terminal-medium-green">
+                          {gameState.research.find(r => r.id === 'project-gui')?.completed 
+                            ? "✓ Ready! Type 'transition gui' in terminal" 
+                            : "Complete Project GUI research first"}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-              
-              {/* Research Basic Macros Goal */}
-              {(gameState.upgrades.find(u => u.id === 'intern')?.owned || 0) > 0 && 
-               !(gameState.research.find(r => r.id === 'basic-macro')?.completed || false) && (
-                <div className="border-l-2 border-current pl-3">
-                  <div className="font-semibold">Research Basic Macros</div>
-                  <div className="terminal-medium-green">Requires: 1 Intern</div>
-                </div>
-              )}
-              
-              {/* GUI Transition Goal */}
-              {gameState.research.find(r => r.id === 'basic-macro')?.completed && (
-                <div className="border-l-2 border-current pl-3">
-                  <div className="font-semibold">Reach GUI Transition</div>
-                  <div className="terminal-medium-green">Complete Project GUI research</div>
-                </div>
+                ))
+              ) : (
+                <div className="terminal-medium-green">All objectives completed!</div>
               )}
             </div>
           </div>
@@ -100,7 +89,7 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
           <div>
             <h3 className="text-lg font-bold mb-4 terminal-glow">UPGRADE CATALOG</h3>
             <div className="space-y-4 text-sm">
-              {gameState.upgrades.filter(u => u.unlocked).map(upgrade => {
+              {terminalUpgrades.map(upgrade => {
                 const cost1 = calculateUpgradeCost(upgrade, 1);
                 const cost10 = calculateUpgradeCost(upgrade, 10);
                 const canAfford1 = gameState.money >= cost1;
@@ -131,10 +120,10 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
 
         {/* Research Tab */}
         {gameState.currentTab === 'research' && (
-          <div className="h-full flex flex-col">
+          <div>
             <h3 className="text-lg font-bold mb-4 terminal-glow">RESEARCH PROJECTS</h3>
-            <div className="flex-1 overflow-y-auto space-y-4 text-sm">
-              {gameState.research.filter(r => r.unlocked && !r.completed).map(research => {
+            <div className="space-y-4 text-sm">
+              {terminalResearch.map(research => {
                 const internCount = gameState.upgrades.find(u => u.id === 'intern')?.owned || 0;
                 const speedMultiplier = 1 + (internCount * 0.5);
                 const actualDuration = Math.round(research.timeRequired / speedMultiplier);
@@ -154,7 +143,7 @@ export default function TabbedInterface({ gameState, onTabSwitch, formatTime }: 
                 );
               })}
               
-              {gameState.research.filter(r => r.unlocked && !r.completed).length === 0 && (
+              {terminalResearch.length === 0 && (
                 <div className="terminal-medium-green">
                   No research available. Purchase upgrades to unlock new projects.
                 </div>

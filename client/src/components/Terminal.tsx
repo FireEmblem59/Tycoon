@@ -151,12 +151,7 @@ export default function Terminal({
 
       case 'help':
         setHasUsedHelp(true);
-        const availableCommands = ['buy [upgrade] [amount]', 'research [project]', 'help', 'clear'];
-        
-        // Add stats if not unlocked yet
-        if (!gameState.unlockedTabs.includes('stats')) {
-          availableCommands.push('stats');
-        }
+        const availableCommands = ['buy [upgrade] [amount]', 'research [project]', 'help', 'clear', 'stats'];
         
         // Add transition only if project-gui is completed
         const projectGUI = gameState.research.find(r => r.id === 'project-gui');
@@ -228,14 +223,14 @@ export default function Terminal({
   };
 
   return (
-    <div className="terminal-border p-4 h-full">
+    <div className="terminal-border p-4 min-h-full">
       <div className="flex justify-between items-center mb-3">
         <span className="text-lg font-bold terminal-glow">TERMINAL v1.1</span>
         <span className="text-sm terminal-medium-green">AUTOMATED ASSEMBLY CORP.</span>
       </div>
       
       {/* Terminal Output */}
-      <div ref={outputRef} className="text-sm h-32 overflow-y-auto mb-4 font-mono border terminal-border p-2" style={{ scrollBehavior: 'smooth' }}>
+      <div ref={outputRef} className="text-sm min-h-[120px] max-h-[200px] overflow-y-auto mb-4 font-mono border terminal-border p-2" style={{ scrollBehavior: 'smooth' }}>
         {history.map((line, index) => (
           <div key={index} className={line.className}>
             {line.text}
