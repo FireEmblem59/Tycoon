@@ -216,7 +216,7 @@ export function useGameState() {
     });
   }, []);
 
-  const startResearch = useCallback((researchId: string) => {
+  const startResearch = useCallback((researchId: string, instant = false) => {
     setGameState((prev) => {
       const research = prev.research.find((r) => r.id === researchId);
       if (
@@ -238,6 +238,18 @@ export function useGameState() {
 
       if (!hasAllDependencies) return prev;
 
+      // If instant research is enabled in debug
+      if (instant) {
+        return {
+          ...prev,
+          research: prev.research.map((r) =>
+            r.id === researchId ? { ...r, completed: true } : r
+          ),
+          currentResearch: null,
+        };
+      }
+
+      // Normal timed research
       const internCount =
         prev.upgrades.find((u) => u.id === "intern")?.owned || 0;
       const speedMultiplier = 1 + internCount * 0.5;
@@ -248,7 +260,7 @@ export function useGameState() {
         currentResearch: {
           id: researchId,
           startTime: Date.now(),
-          duration: actualDuration * 1000, // Convert to milliseconds
+          duration: actualDuration * 1000, // ms
         },
       };
     });

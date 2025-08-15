@@ -79,6 +79,7 @@ export default function GameInterface() {
         onBuyUpgrade={buyUpgrade}
         onStartResearch={startResearch}
         onSwitchTab={switchTab}
+        onAddMoney={addMoney}
       />
     );
   }
