@@ -7,7 +7,7 @@ export interface Upgrade {
   effect: string;
   unlocked: boolean;
   costMultiplier: number;
-  era: 'terminal' | 'gui' | 'internet';
+  era: "terminal" | "gui" | "internet";
 }
 
 export interface Research {
@@ -20,7 +20,7 @@ export interface Research {
   unlocked: boolean;
   completed: boolean;
   effect: string;
-  era: 'terminal' | 'gui' | 'internet';
+  era: "terminal" | "gui" | "internet";
 }
 
 export interface Goal {
@@ -30,7 +30,7 @@ export interface Goal {
   completed: boolean;
   visible: boolean;
   requirement: () => boolean;
-  era: 'terminal' | 'gui' | 'internet';
+  era: "terminal" | "gui" | "internet";
 }
 
 export const initialUpgrades: Upgrade[] = [
@@ -44,7 +44,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+50% research speed per intern",
     unlocked: true,
     costMultiplier: 1.5,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "coffee-machine",
@@ -55,7 +55,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$0.5/sec per machine",
     unlocked: true,
     costMultiplier: 1.3,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "script",
@@ -66,7 +66,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$1/sec per script",
     unlocked: true,
     costMultiplier: 1.8,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "tooling",
@@ -77,7 +77,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$1 per manual assembly",
     unlocked: false,
     costMultiplier: 1.6,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "assembly-optimizer",
@@ -88,7 +88,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$2 per manual assembly",
     unlocked: false,
     costMultiplier: 1.7,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "script-enhancer",
@@ -99,7 +99,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$0.5/sec to each script",
     unlocked: false,
     costMultiplier: 1.9,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "intern-manager",
@@ -110,7 +110,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+25% additional research speed boost per intern",
     unlocked: false,
     costMultiplier: 2.0,
-    era: 'terminal'
+    era: "terminal",
   },
   // GUI Era Upgrades
   {
@@ -122,7 +122,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$0.5 per button press",
     unlocked: true,
     costMultiplier: 1.4,
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "auto-clicker",
@@ -133,7 +133,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+1 button press/sec",
     unlocked: false,
     costMultiplier: 1.6,
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "gui-framework",
@@ -144,7 +144,7 @@ export const initialUpgrades: Upgrade[] = [
     effect: "Enables window management",
     unlocked: false,
     costMultiplier: 1.8,
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "graphics-card",
@@ -155,8 +155,8 @@ export const initialUpgrades: Upgrade[] = [
     effect: "+$2 per button press",
     unlocked: false,
     costMultiplier: 2.0,
-    era: 'gui'
-  }
+    era: "gui",
+  },
 ];
 
 export const initialResearch: Research[] = [
@@ -171,7 +171,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Assembly command shortened",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "advanced-macro",
@@ -183,7 +183,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Assembly command further shortened",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "clipboard-api",
@@ -195,7 +195,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Allows pasting assembly command",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "ascii-schematics",
@@ -207,7 +207,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Visual assembly station enhancement",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "improved-cli",
@@ -219,7 +219,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Enhanced terminal interface",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "stats-dashboard",
@@ -231,7 +231,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Enables stats tab",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "efficiency-research",
@@ -243,7 +243,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Unlocks efficiency upgrades",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "automation-theory",
@@ -255,7 +255,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Unlocks script upgrades",
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "project-gui",
@@ -263,11 +263,17 @@ export const initialResearch: Research[] = [
     description: "WIMP Interface Development - Unlocks transition to GUI era",
     cost: 0,
     timeRequired: 300,
-    dependencies: ["basic-macro", "advanced-macro", "clipboard-api", "ascii-schematics", "stats-dashboard"],
+    dependencies: [
+      "basic-macro",
+      "advanced-macro",
+      "clipboard-api",
+      "ascii-schematics",
+      "stats-dashboard",
+    ],
     unlocked: false,
     completed: false,
     effect: "Enables stage transition to GUI era",
-    era: 'terminal'
+    era: "terminal",
   },
   // GUI Era Research
   {
@@ -280,7 +286,7 @@ export const initialResearch: Research[] = [
     unlocked: true,
     completed: false,
     effect: "Unlocks window management features",
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "event-system",
@@ -292,7 +298,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Enables advanced UI interactions",
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "graphics-api",
@@ -304,7 +310,7 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Improves visual performance",
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "networking-stack",
@@ -316,8 +322,8 @@ export const initialResearch: Research[] = [
     unlocked: false,
     completed: false,
     effect: "Prepares for Internet era transition",
-    era: 'gui'
-  }
+    era: "gui",
+  },
 ];
 
 export const initialGoals: Goal[] = [
@@ -329,43 +335,47 @@ export const initialGoals: Goal[] = [
     completed: false,
     visible: true,
     requirement: () => false, // Will be set by game state
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "first-assembly",
     title: "First Assembly",
-    description: "Type 'assemble' in the Manual Assembly Station to earn your first dollar",
+    description:
+      "Type 'assemble' in the Manual Assembly Station to earn your first dollar",
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "hire-intern",
     title: "Hire Your First Intern",
-    description: "Purchase an intern to unlock research capabilities",
+    description:
+      "Type `buy intern` in the terminal to hire an intern. Interns unlock research capabilities. You can find other upgrade in the upgrade tab.",
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "first-research",
     title: "Begin Research",
-    description: "Start your first research project to improve efficiency",
+    description:
+      "Type `research basic-macro` in the terminal to begin your first project and improve efficiency. You can find other reseach in the research tab.",
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'terminal'
+    era: "terminal",
   },
   {
     id: "gui-transition",
     title: "Reach GUI Era",
-    description: "Complete 'Project GUI' research, then type 'transition gui' to advance to the next era",
+    description:
+      "Complete 'Project GUI' research, then type 'transition gui' to advance to the next era",
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'terminal'
+    era: "terminal",
   },
   // GUI Era Goals
   {
@@ -375,7 +385,7 @@ export const initialGoals: Goal[] = [
     completed: false,
     visible: true,
     requirement: () => false,
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "gui-upgrade",
@@ -384,7 +394,7 @@ export const initialGoals: Goal[] = [
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'gui'
+    era: "gui",
   },
   {
     id: "automation",
@@ -393,8 +403,8 @@ export const initialGoals: Goal[] = [
     completed: false,
     visible: false,
     requirement: () => false,
-    era: 'gui'
-  }
+    era: "gui",
+  },
 ];
 
 export const commands = {
@@ -402,11 +412,11 @@ export const commands = {
   buy: {
     description: "Purchase upgrades",
     syntax: "buy [upgrade-id] [amount]",
-    examples: ["buy intern 1", "buy script 5"]
+    examples: ["buy intern 1", "buy script 5"],
   },
   research: {
     description: "Start research projects",
     syntax: "research [project-id]",
-    examples: ["research basic-macro"]
-  }
+    examples: ["research basic-macro"],
+  },
 };

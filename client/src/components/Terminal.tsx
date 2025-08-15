@@ -35,7 +35,9 @@ export default function Terminal({
     },
   ]);
 
-  // hasUsedHelp is now a prop from parent component
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+
   const outputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -175,7 +177,6 @@ export default function Terminal({
           return;
         }
 
-        // Check dependencies
         const hasAllDeps = research.dependencies.every((dep) => {
           if (dep === "intern")
             return (
@@ -219,7 +220,6 @@ export default function Terminal({
           "stats",
         ];
 
-        // Add transition only if project-gui is completed
         const projectGUI = gameState.research.find(
           (r) => r.id === "project-gui"
         );
@@ -235,10 +235,10 @@ export default function Terminal({
 
       case "transition":
         if (parts[1] === "gui") {
-          const projectGUI = gameState.research.find(
+          const projectGUI2 = gameState.research.find(
             (r) => r.id === "project-gui"
           );
-          if (projectGUI?.completed) {
+          if (projectGUI2?.completed) {
             addToHistory(
               command,
               'WARNING: Transitioning will reset all progress. Type "confirm-transition" to proceed',
@@ -286,7 +286,6 @@ export default function Terminal({
         ]);
         return;
 
-      // Debug commands (not shown in help)
       case "reset":
         onResetGame();
         setHasUsedHelp(false);
@@ -322,12 +321,11 @@ export default function Terminal({
 
       case "skipterminal":
         if (onTransitionToGUI) {
-          // Pretend Project GUI research is done
-          const projectGUI = gameState.research.find(
+          const projectGUI3 = gameState.research.find(
             (r) => r.id === "project-gui"
           );
-          if (projectGUI && !projectGUI.completed) {
-            projectGUI.completed = true;
+          if (projectGUI3 && !projectGUI3.completed) {
+            projectGUI3.completed = true;
           }
           addToHistory(
             command,
@@ -354,10 +352,34 @@ export default function Terminal({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      handleCommand(input);
-      setInput("");
+      if (input.trim() !== "") {
+        handleCommand(input);
+        setCommandHistory((prev) => [...prev, input]);
+        setHistoryIndex(null);
+        setInput("");
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHistoryIndex((prev) => {
+        const newIndex =
+          prev === null ? commandHistory.length - 1 : Math.max(prev - 1, 0);
+        setInput(commandHistory[newIndex] || "");
+        return newIndex;
+      });
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHistoryIndex((prev) => {
+        if (prev === null) return null;
+        const newIndex = prev + 1;
+        if (newIndex >= commandHistory.length) {
+          setInput("");
+          return null;
+        }
+        setInput(commandHistory[newIndex] || "");
+        return newIndex;
+      });
     }
   };
 
@@ -370,7 +392,6 @@ export default function Terminal({
         </span>
       </div>
 
-      {/* Terminal Output */}
       <div
         ref={outputRef}
         className="text-sm min-h-[120px] max-h-[200px] overflow-y-auto mb-4 font-mono border terminal-border p-2"
@@ -383,7 +404,6 @@ export default function Terminal({
         ))}
       </div>
 
-      {/* Terminal Input */}
       <div className="flex items-center">
         <span className="mr-2 text-lg">{">"}</span>
         <input
@@ -392,17 +412,7 @@ export default function Terminal({
           placeholder="Enter command..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          onPaste={(e) => {
-            if (!gameState.clipboardEnabled) {
-              e.preventDefault();
-              addToHistory(
-                input,
-                'ERROR: Clipboard disabled - research "clipboard-api"',
-                "text-red-400"
-              );
-            }
-          }}
+          onKeyDown={handleKeyDown}
         />
       </div>
     </div>
